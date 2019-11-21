@@ -1,25 +1,15 @@
 pragma solidity >=0.4.22 <0.6.0;
 
-// import "./ERC20.sol";
-
-// import "https://github.com/provable-things/ethereum-api/blob/master/oraclizeAPI_0.5.sol";
-
 contract Lottery {
-
-    // uint public constant ticketPrice = 0.01 ether;
 
     // owner of the contract
     address payable public owner;
-
+    
     uint public _startTime;
     uint public _endTime;
 
     bool public _isGameStarted;
     bool public _isGameEnded;
-
-    // record of players who buy ticket
-    // players show as address, need mapping to record "which address already buy ticket"
-    // mapping (address=>bool) playerBook;
 
     // 紀錄每個開獎號碼所有投入的玩家列表
     mapping (uint=>address payable[]) playerData;
@@ -33,9 +23,6 @@ contract Lottery {
     // record all the addresses
     address payable[] playersAddress;
 
-    // uint[] public RNDArray;
-    // mapping (uint=>bool) RNDTable;
-
     // event: the only way to communicate with outside
     // indexed: speed up the search rate
     event Bet(address indexed _buyer, uint _spent, uint _buyTime);
@@ -45,35 +32,9 @@ contract Lottery {
     constructor() public {
         owner = msg.sender;
         startGame();
-        // generateRNDArr(1, 10);
     }
 
-    // // 遞迴產生給定長度的隨機數陣列與Mapping
-    // function generateRNDArr(uint length, uint _nonce) internal {
-    //     if(RNDArray.length>=length)
-    //         return;
-            
-    //     uint rnd = _generateRND(_nonce++);
-    //     if(RNDTable[rnd] == false) {
-    //         RNDTable[rnd] = true;
-    //         RNDArray.push(rnd);
-    //     }
-    //     generateRNDArr(length, _nonce);
-    // }
-
-    // // 產生隨機數
-    // function _generateRND(uint _nonce) internal view returns(uint8) {
-    //     return uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%_nonce);
-    // }
-
-    // // 取得隨機數陣列
-    // function getRNDArr() public view returns(uint[] memory, uint) {
-    //     return (RNDArray, RNDArray.length);
-    // }
-
-    // 定義一些高權限事項的修改器
-    // modifier: pre-process, check, verify
-    
+    // 定義一些高權限事項的修改器 (pre-process, check, verify)
     modifier onlyOwnerCanDoThis() {
         require(msg.sender==owner, "onlyOwnerCanDoThis");
         _;
