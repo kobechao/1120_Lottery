@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>TutorialToken - Wallet</title>
+    <title>Lottery - Wallet</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -21,7 +21,7 @@
     <div class="container">
       <div class="row">
         <div class="col-xs-12 col-sm-8 col-sm-push-2">
-          <h1 class="text-center">TutorialToken</h1>
+          <h1 class="text-center">Lottery</h1>
           <hr/>
           <br/>
         </div>
@@ -34,8 +34,15 @@
               <h3 class="panel-title">My Wallet</h3>
             </div>
             <div class="panel-body">
-              <h4>Balance</h4>
-              <strong>Balance</strong>: <span id="TTBalance"></span> TT<br/><br/>
+              <h4>開獎號碼</h4>
+              <strong>開獎號碼</strong>: <span id="TTBalance"></span> <br/><br/>
+              <strong>投入金額</strong>: <br></br>
+              <div>
+                  <span id="index1">開獎號(1)</span>:<span id="index1_val"> ETH</span> <br/><br/>
+                  <span id="index2">開獎號(2)</span>:<span id="index2_val"> ETH</span> <br/><br/>
+                  <span id="index3">開獎號(3)</span>:<span id="index3_val"> ETH</span> <br/><br/>
+                </div>
+
               <h4>Transfer</h4>
               <input type="text" class="form-control" id="TTTransferAddress" placeholder="Address" />
               <input type="text" class="form-control" id="TTTransferAmount" placeholder="Amount" />
