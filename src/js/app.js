@@ -1,12 +1,14 @@
 App = {
   web3Provider: null,
+  originProvider: null,
   contracts: {},
+  anotherWeb3: null,
 
-  init: function() {
+  init: function () {
     return App.initWeb3();
   },
 
-  initWeb3: function() {
+  initWeb3: function () {
     // Initialize web3 and set the provider to the testRPC.
     if (typeof web3 !== 'undefined') {
       App.web3Provider = web3.currentProvider;
@@ -17,11 +19,13 @@ App = {
       web3 = new Web3(App.web3Provider);
     }
 
+    App.anotherWeb3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'));
+
     return App.initContract();
   },
 
-  initContract: function() {
-    $.getJSON('Lottery.json', function(data) {
+  initContract: function () {
+    $.getJSON('Lottery.json', function (data) {
       // Get the necessary contract artifact file and instantiate it with truffle-contract.
       let LotteryArtifact = data;
       App.contracts.Lottery = TruffleContract(LotteryArtifact);
@@ -30,71 +34,70 @@ App = {
       App.contracts.Lottery.setProvider(App.web3Provider);
 
       // Use our contract to retieve and mark the adopted pets.
-      return App.getBalances();
+      return App.initInfo();
     });
 
     return App.bindEvents();
   },
 
-  bindEvents: function() {
-    $(document).on('click', '#transferButton', App.handleTransfer);
+  bindEvents: function () {
+    $(document).on('click', '#bet0', { num: 0 }, App.handleBetClick);
+    $(document).on('click', '#bet1', { num: 1 }, App.handleBetClick);
+    $(document).on('click', '#bet2', { num: 2 }, App.handleBetClick);
   },
 
-  handleTransfer: function(event) {
-    event.preventDefault();
+  handleBetClick: function (event) {
+    console.log(event.data.num);
+    let num = event.data.num;
+    let lotteryInstance;
+    // To-Do
+    App.contracts.Lottery.deployed().then(function (instance) {
+      lotteryInstance = instance;
+      return lotteryInstance.bet(num, { from: accounts[0] });
+    }).then(result => {
 
-    let amount = parseInt($('#TTTransferAmount').val());
-    let toAddress = $('#TTTransferAddress').val();
+    }).catch(err => {
+      console.log(err)
+    })
+  },
 
-    console.log('Transfer ' + amount + ' TT to ' + toAddress);
+  initInfo: function () {
 
     let lotteryInstance;
 
-    web3.eth.getAccounts(function(error, accounts) {
+    web3.eth.getAccounts(function (error, accounts) {
       if (error) {
         console.log(error);
       }
 
       let account = accounts[0];
+      App.anotherWeb3.eth.getAccounts((err, accounts) => {
 
-      App.contracts.Lottery.deployed().then(function(instance) {
+        for (let i in accounts) {
+          $("#accounts").append(`
+          <li>
+            <span>${accounts[i]}<span><p></p>
+            <span>${(App.anotherWeb3.eth.getBalance(accounts[i]) / 10 ** 18)} ETH</span>
+            <br></br>
+          </li>`
+          )
+        }
+      })
+
+      App.contracts.Lottery.deployed().then(function (instance) {
         lotteryInstance = instance;
 
-        return lotteryInstance.transfer(toAddress, amount, {from: account, gas: 100000});
-      }).then(function(result) {
-        alert('Transfer Successful!');
-        return App.getBalances();
-      }).catch(function(err) {
-        console.log(err.message);
-      });
-    });
-  },
+        return Promise.all([
+          lotteryInstance.getNum(0),
+          lotteryInstance.getNum(1),
+          lotteryInstance.getNum(2),
+        ])
+      }).then(data => {
+        $('#index0_val').text(`${data[0][0] / 10 ** 18}`);
+        $('#index1_val').text(`${data[1][0] / 10 ** 18}`);
+        $('#index2_val').text(`${data[2][0] / 10 ** 18}`);
 
-  getBalances: function() {
-    console.log('Getting balances...');
-
-    let lotteryInstance;
-
-    web3.eth.getAccounts(function(error, accounts) {
-      if (error) {
-        console.log(error);
-      }
-
-      let account = accounts[0];
-      console.log(accounts);
-      
-      App.contracts.Lottery.deployed().then(function(instance) {
-        lotteryInstance = instance;
-
-        return lotteryInstance.getRNDArr();
-      }).then(function(result) {
-        // console.log(result);
-        
-        $('#TTBalance').text(result[0]);
-        $('#index1').text(`開獎號(${result[0][0]})`);
-        $('#index2').text(`開獎號(${result[0][1]})`);
-        $('#index3').text(`開獎號(${result[0][2]})`);
-      }).catch(function(err) {
+      }).catch(function (err) {
         console.log(err.message);
       });
     });
@@ -102,8 +105,8 @@ App = {
 
 };
 
-$(function() {
-  $(window).load(function() {
+$(function () {
+  $(window).load(function () {
     App.init();
   });
 });

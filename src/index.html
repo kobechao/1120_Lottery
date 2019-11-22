@@ -34,19 +34,27 @@
               <h3 class="panel-title">My Wallet</h3>
             </div>
             <div class="panel-body">
-              <h4>開獎號碼</h4>
-              <strong>開獎號碼</strong>: <span id="TTBalance"></span> <br/><br/>
-              <strong>投入金額</strong>: <br></br>
+              <strong>總投入金額</strong>：<br></br>
               <div>
-                  <span id="index1">開獎號(1)</span>:<span id="index1_val"> ETH</span> <br/><br/>
-                  <span id="index2">開獎號(2)</span>:<span id="index2_val"> ETH</span> <br/><br/>
-                  <span id="index3">開獎號(3)</span>:<span id="index3_val"> ETH</span> <br/><br/>
+                  <span>開獎號(1)</span>：<span id="index0_val"></span><span> ETH</span> <button id="bet0">Bet!</button><br/><br/>
+                  <span>開獎號(2)</span>：<span id="index1_val"></span><span> ETH</span> <button id="bet1">Bet!</button><br/><br/>
+                  <span>開獎號(3)</span>：<span id="index2_val"></span><span> ETH</span> <button id="bet2">Bet!</button><br/><br/>
                 </div>
 
-              <h4>Transfer</h4>
-              <input type="text" class="form-control" id="TTTransferAddress" placeholder="Address" />
+              <h4>各帳戶餘額</h4>
+              <div>
+                <ul id="accounts">
+                  <!-- <li>
+                      <spen>1</spen>
+                      <spen>2</spen>
+                    </li>
+                  <li>1</li>
+                  <li>1</li> -->
+                </ul>
+              </div>
+              <!-- <input type="text" class="form-control" id="TTTransferAddress" placeholder="Address" />
               <input type="text" class="form-control" id="TTTransferAmount" placeholder="Amount" />
-              <button class="btn btn-primary" id="transferButton" type="button">Transfer</button>
+              <button class="btn btn-primary" id="transferButton" type="button">Transfer</button> -->
             </div>
           </div>
         </div>
