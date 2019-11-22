@@ -20,6 +20,10 @@ contract Lottery {
     // 玩家投入金額
     mapping (address=>uint) balances;
 
+    // record of players who buy ticket
+    // players show as address, need mapping to record "which address already buy ticket"
+    mapping (address=>bool) playerBook;
+    
     // record all the addresses
     address payable[] playersAddress;
 
@@ -68,9 +72,14 @@ contract Lottery {
 
     function bet(uint _index) public payable {
         
-        require(_index>=0 && _index<=9);
+        // require(_index>=0 && _index<=9);
+        require(_index>=0 && _index<=2);
+
         require(_isGameStarted == true);
         require(_isGameEnded == false);
+        
+        require(playerBook[msg.sender] == false, "Already bought");
+        playerBook[msg.sender] = true;
         
         uint value = msg.value;
         indexTotalValue[_index] += value;
@@ -88,7 +97,7 @@ contract Lottery {
     }
     
     function selectWinIndex() public view returns(uint) {
-        return uint(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%10);
+        return uint(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%3);
     }
 
     function sendProfitToWinners() internal {
@@ -96,9 +105,12 @@ contract Lottery {
         uint winIndex = selectWinIndex();
         
         uint amount = 0;
-        for(uint i=0; i<=9; i++)
+        // for(uint i=0; i<=9; i++)
+        //     amount += indexTotalValue[i];
+
+       for(uint i=0; i<=2; i++)
             amount += indexTotalValue[i];
-        
+  
         address payable[] memory winners = playerData[winIndex];
         for(uint j=0; j<winners.length; j++){
             address payable win = winners[j];
