@@ -22,7 +22,12 @@ contract Lottery {
 
     // record of players who buy ticket
     // players show as address, need mapping to record "which address already buy ticket"
-    mapping (address=>bool) playerBook;
+    mapping (address=>playerStatus) playerBook;
+    
+    struct playerStatus {
+        bool isjoin;
+        uint index;
+    }
     
     // record all the addresses
     address payable[] playersAddress;
@@ -30,7 +35,9 @@ contract Lottery {
     // event: the only way to communicate with outside
     // indexed: speed up the search rate
     event Bet(address indexed _buyer, uint _spent, uint _buyTime);
-    event Winner(address indexed _winner, uint _amount, string msg);
+    event Winner(address indexed _winner, uint _amount,uint a, uint b, uint c, string msg);
+    
+    uint public finalWinIndex;
     
     // start contract
     constructor() public {
@@ -69,22 +76,31 @@ contract Lottery {
         _isGameStarted = false;
         sendProfitToWinners();
     }
-
+    
+    // function getPlayerStatus() public view returns(bool, uint) {
+    //     return (playerBook[msg.sender].isjoin, playerBook[msg.sender].index);
+    // }
+    
     function bet(uint _index) public payable {
         
-        // require(_index>=0 && _index<=9);
-        require(_index>=0 && _index<=2);
+        // avoid 0 because _index default value 0
+        // require(_index>=1 && _index<=9);
+        require(_index>=1 && _index<=3);
 
         require(_isGameStarted == true);
         require(_isGameEnded == false);
+        require(playerBook[msg.sender].isjoin == false || playerBook[msg.sender].index == _index, "Already bought");
         
-        require(playerBook[msg.sender] == false, "Already bought");
-        playerBook[msg.sender] = true;
-        
+        if(playerBook[msg.sender].isjoin == false){
+            playerData[_index].push(msg.sender);
+        }
+
+        playerBook[msg.sender].isjoin = true;
+        playerBook[msg.sender].index = _index;
+
         uint value = msg.value;
         indexTotalValue[_index] += value;
-        playerData[_index].push(msg.sender);
-        balances[msg.sender] = value;
+        balances[msg.sender] += value;
         emit Bet(msg.sender, msg.value, now);
         
         if(now >= _endTime)
@@ -97,26 +113,27 @@ contract Lottery {
     }
     
     function selectWinIndex() public view returns(uint) {
-        return uint(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%3);
+        return uint(uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)))%3)+1;
     }
 
     function sendProfitToWinners() internal {
         // address payable winner = selectWinner();
         uint winIndex = selectWinIndex();
+        finalWinIndex = winIndex;
         
         uint amount = 0;
-        // for(uint i=0; i<=9; i++)
+        // for(uint i=1; i<=9; i++)
         //     amount += indexTotalValue[i];
 
-       for(uint i=0; i<=2; i++)
+       for(uint i=1; i<=3; i++)
             amount += indexTotalValue[i];
   
         address payable[] memory winners = playerData[winIndex];
         for(uint j=0; j<winners.length; j++){
             address payable win = winners[j];
-            uint profit = amount*(balances[win]/indexTotalValue[winIndex]);
+            uint profit = amount*balances[win]/indexTotalValue[winIndex];
             win.transfer(profit);
-            emit Winner(win, profit,"Winner Found!");
+            emit Winner(win, profit, amount, balances[win], indexTotalValue[winIndex], "Winner Found!");
             
             //prevent reentrancy attack
             profit = 0;            
