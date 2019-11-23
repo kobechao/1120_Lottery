@@ -41,21 +41,24 @@ App = {
   },
 
   bindEvents: function () {
-    $(document).on('click', '#bet0', { num: 0 }, App.handleBetClick);
-    $(document).on('click', '#bet1', { num: 1 }, App.handleBetClick);
-    $(document).on('click', '#bet2', { num: 2 }, App.handleBetClick);
+    $(document).on('click', '#bet0', { num: 1 }, App.handleBetClick);
+    $(document).on('click', '#bet1', { num: 2 }, App.handleBetClick);
+    $(document).on('click', '#bet2', { num: 3 }, App.handleBetClick);
   },
 
   handleBetClick: function (event) {
     console.log(event.data.num);
     let num = event.data.num;
     let lotteryInstance;
-    // To-Do
     App.contracts.Lottery.deployed().then(function (instance) {
       lotteryInstance = instance;
-      return lotteryInstance.bet(num, { from: accounts[0] });
+      console.log(accounts)
+      let betNum = $(`#betVal${num}`).val();
+      console.log(`#betVal${num}`)
+      console.log(betNum)
+      return lotteryInstance.bet(num, { from: accounts[0], value: betNum * 10 **18});
     }).then(result => {
-
+      console.log(result)
     }).catch(err => {
       console.log(err)
     })
@@ -88,9 +91,9 @@ App = {
         lotteryInstance = instance;
 
         return Promise.all([
-          lotteryInstance.getNum(0),
           lotteryInstance.getNum(1),
           lotteryInstance.getNum(2),
+          lotteryInstance.getNum(3),
         ])
       }).then(data => {
         $('#index0_val').text(`${data[0][0] / 10 ** 18}`);

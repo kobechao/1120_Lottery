@@ -67,7 +67,7 @@ contract Lottery {
     function startGame() internal {
         _isGameStarted = true;
         _startTime = now;
-        _endTime = _startTime + 1 minutes;
+        _endTime = _startTime + 10 minutes;
     }
 
     // exceed end time
